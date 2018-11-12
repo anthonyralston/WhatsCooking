@@ -14,6 +14,7 @@ Anthony Ralston - aralsto@purdue.edu
 # Import required libraries
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
+from sklearn.svm import LinearSVC
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -57,7 +58,7 @@ print("Number of Cuisine Types: ", y.nunique())
 print("Training Dataset Shape: ", X.shape)
 print("Testing Dataset Shape: ", testing_dataframe.shape)
 
-# Training modeling
+# Training logistic regression model
 """
 Logistic Regression model provided out of the box has a
 number of parameters. See: https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html.
@@ -71,11 +72,28 @@ Reviewing the parameters, it seems we should set the following:
                         negative.
                         When selecting 'ovr', 'liblinear' needs to be selected for solver.
 """
-print("Training model...")
+print("Training logistic regression model...")
 model = LogisticRegression(penalty='l2', solver='liblinear', multi_class='ovr')
 model.fit(X, y)
 
-print("Predicting...")
+# Predicting using logistic regression model
+print("Predicting using logistic regression model...")
 y_pred = model.predict(testing_dataframe)
 y_pred_dataframe = pd.Series(y_pred, index=testing_df_index).rename('cuisine')
-print(y_pred_dataframe)
+print(y_pred_dataframe.head)
+
+# Training multi-class SVM
+"""
+For multi-class classification, sklearn provides a couple of different SVM options out of the
+box. Of the classifiers available, it appears 'LinearSVC' is the one to use as it is the
+only model that implements One-vs-the-Rest.
+"""
+print("Training SVM model...")
+model = LinearSVC(penalty='l2', multi_class='ovr')
+model.fit(X, y)
+
+#Predicting using SVM
+print("Predicting using SVM model...")
+y_pred = model.predict(testing_dataframe)
+y_pred_dataframe = pd.Series(y_pred, index=testing_df_index).rename('cuisine')
+print(y_pred_dataframe.head)
